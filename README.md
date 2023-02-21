@@ -78,6 +78,9 @@ code .
 
 ```
 ### step 6
+
+```
+
 wafer_proj
 ==============================
 
@@ -135,5 +138,200 @@ Project Organization
 --------
 
 <p><small>Project based on the <a target="_blank" href="https://drivendata.github.io/cookiecutter-data-science/">cookiecutter data science project template</a>. #cookiecutterdatascience</small></p>
+
+```
+
+### step 7: dvc install
+
+```
+pip install dvc
+
+```
+
+### step 8: initializing dvc
+
+```
+
+pip install dvc==2.10.2
+pip install --force-reinstall -v "fsspec==2022.11.0"
+dvc init -f
+
+```
+
+### step 9:  Creating Development branch
+
+```
+
+git chechout -b dev
+
+```
+
+### step 10: add training and testing files
+
+
+### step 11: push to dev branch
+
+
+### Step 12 : install DVC for gdrive
+
+```
+
+pip install dvc_gdrive
+
+```
+
+### step 13 : add remote storage
+
+```
+dvc remote add -d storage gdrive://<DRIVE ID>
+
+git add .dvc/config && git commit -m "Configure remote storage"
+
+dvc push
+
+```
+
+### Step 14: create a new file in src
+
+```
+touch src/pipeline_01_data_preparation.py
+
+```
+### step 15 : Enter the code
+
+```
+
+import os
+import argparse
+import yaml
+import logging
+
+
+
+
+
+
+if __name__=='__main__':
+    args=argparse.ArgumentParser()
+    args.add_argument("--config",default="default")
+    args.add_argument("--datasource",default=None)
+
+    parsed_args=args.parse_args()
+    print(parsed_args)
+    print(parsed_args.config,parsed_args.datasource)
+
+```
+
+### Step 16 : creating a config folder 
+
+```
+mkdir config
+
+touch config/params.yaml
+
+```
+
+### step 17 :  write the below code in params.yaml
+
+```
+
+base:
+  project: Wafer-Quality-Project
+  random_state: 42
+  target_col: Output
+
+data_source:
+  batch_files: Training_Batch_Files
+
+
+data_preparation:
+  training_db: Training.db
+  training_db_dir: Training_Database
+  schema_training: config/schema_training.json
+  good_validated_raw_dir: data/Training_Raw_files_validated/Good_raw
+  bad_validated_raw_dir: data/Training_Raw_files_validated/Bad_raw
+  TrainingArchiveBadData: data/TrainingArchiveBadData
+  Training_FileFromDB: data/Training_FileFromDB
+  master_csv: master.csv
+
+pred_data_preparation:
+  prediction_db: Prediction.db
+  prediction_db_dir: Prediction_Database
+  schema_prediction: config/schema_prediction.json
+  good_validated_raw_dir: data/Prediction_Raw_files_validated/Good_raw
+  bad_validated_raw_dir: data/Prediction_Raw_files_validated/Bad_raw
+  PredictionArchiveBadData: data/PredictionArchiveBadData
+  Prediction_FileFromDB: data/Prediction_FileFromDB
+  master_csv: master.csv
+  Prediction_Output_File: Prediction_Output_File/Predictions.csv
+
+
+saved_models:
+  model_dir: models
+
+data_preprocessing:
+  preprocessed_data_dir: data/preprocessed_data
+  null_values_csv: null_values.csv
+
+  preprocessed_data_dir_pred: data/preprocessed_data_pred
+
+
+  KNNImputer: 
+    n_neighbors: 3 
+    weights: uniform
+    missing_values: nan
+
+  KMeansClustering:
+    init: k-means++
+    n_cluster_max: 11
+    KneeLocator: 
+      curve: convex
+      direction: decreasing
+    
+
+artifacts_dir: 
+  general: general
+  mlflow: mlflow_artifacts
+
+
+training:
+  random_forest:
+    cv: 5
+    verbose: 3
+    param_grid:
+      n_estimators: 
+        - 10
+        - 50
+        - 100
+        - 130 
+      criterion: 
+        - gini
+        - entropy
+      max_depth: 
+        - 2
+        - 4
+      max_features: 
+        - auto
+        - log2
+  xg_boost:
+    cv: 5
+    verbose: 3
+    param_grid:
+      learning_rate: 
+        - 0.5
+        - 0.1
+        - 0.01
+        - 0.001
+      max_depth: 
+        - 3
+        - 5
+        - 10
+        - 20
+      n_estimators: 
+        - 10
+        - 50
+        - 100
+        - 200
+ 
 
 ```
